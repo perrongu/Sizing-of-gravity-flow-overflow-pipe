@@ -103,6 +103,14 @@ input[type="number"] {
     border-radius: 4px; /* Coins arrondis pour le champ de saisie */
 }
 
+#Q_max_input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 button {
     background-color: var(--blue-marine); /* Définir la couleur bleue primaire pour les boutons */
     color: var(--white); /* Couleur de texte blanche pour le contraste */

@@ -19,6 +19,7 @@
         <label for="Q_max">Débit volumique maximal (Q_max) en m³/h :</label>
         <input type="range" id="Q_max" name="Q_max" min="0" max="500" step="1" value="50" oninput="updateQmaxValue(this.value)">
         <span id="Q_max_value">50</span> m³/h
+        <input type="number" id="Q_max_input" name="Q_max_input" min="0" max="500" step="1" value="50" oninput="updateQmaxRange(this.value)">
         
         <label for="pipeType">Type de tuyauterie :</label>
         <select id="pipeType" name="pipeType" required>
