@@ -8,22 +8,30 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
 </head>    
 <body>
     <h1>Calcul du Diamètre d'un overflow de réservoir atmosphérique</h1>
 
-    <h2>Données</h2>
+    <h2>Données requises</h2>
     <form id="inputForm">
         <label for="Q_max">Débit volumique maximal (Q_max) en m³/h :</label>
-        <input type="number" id="Q_max" name="Q_max" step="0.01" required>
+        <input type="range" id="Q_max" name="Q_max" min="0" max="500" step="1" value="50" oninput="updateQmaxValue(this.value)">
+        <span id="Q_max_value">50</span> m³/h
         
         <label for="pipeType">Type de tuyauterie :</label>
         <select id="pipeType" name="pipeType" required>
-            <option value="" disabled selected>Sélectionnez un type de tuyauterie</option>
+            <option value="" disabled>Sélectionnez un type de tuyauterie</option>
+            <option value="Steel_SCH40" selected>Steel_SCH40</option>
         </select>        
-
-        <button type="submit">Calculer</button>
     </form>
+
+    <h2>Graphique ID vs Qmax</h2>
+    <div class="chart-container">
+        <canvas id="chart"></canvas>
+    </div>
+    <p id="highlightedPoint"></p>
 
     <h2>Résultat</h2>
     <p>
@@ -33,17 +41,14 @@
 
     <h2>Calcul du Diamètre d</h2>
     <p>
-        La formule pour le calcul du diamètre est : <br>
-        <div class="formula">
-            \( d = \left( \frac{4 \cdot Q_{\text{max}}}{\pi \cdot J_t \cdot \sqrt{g}} \right)^{\frac{2}{5}} \)
-        </div>
+        La formule pour le calcul du diamètre est : \( d = \left( \frac{4 \cdot Q_{\text{max}}}{0.3 \pi \sqrt{g}} \right)^{0.4} \)
     </p>
-
 
     <h2>Conversion en mm</h2>
     <p>
         Diamètre calculé (d) converti en mm : d_mm = d * 1000
     </p>
+
     <h2>Diamètres Intérieurs Standards</h2>
     <p>Diamètres intérieurs standards pour les conduites :</p>
     <table id="diameterTable">
@@ -58,7 +63,15 @@
         </tbody>
     </table>
 
+    <footer>
+        <h3>Références</h3>
+        <ul>
+            <li><a href="Gravity-Flow-Piping_FR.pdf" target="_blank">Gravity-Flow-Piping_FR.pdf</a></li>
+            <li><a href="Gravity-Flow-Piping_EN.pdf" target="_blank">Gravity-Flow-Piping_EN.pdf</a></li>
+            <li><a href="Gravity-Flow-Piping_ORIGINAL.pdf" target="_blank">Gravity-Flow-Piping_ORIGINAL.pdf</a></li>
+        </ul>
+    </footer>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

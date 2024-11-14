@@ -73,6 +73,19 @@ form {
     max-width: 600px; /* Limiter la largeur du formulaire pour une meilleure mise en page */
     margin-bottom: 20px; /* Ajouter un espacement en dessous du formulaire */
     font-family: 'Century Gothic', sans-serif; /* Utiliser une police différente pour les formulaires */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+form label, form input, form select {
+    flex: 1 1 100%;
+    margin-bottom: 10px;
+}
+
+form button {
+    flex: 0 1 auto;
+    margin-left: auto;
 }
 
 label {
@@ -165,4 +178,10 @@ td {
     padding: 15px; /* Espacement interne pour aérer la formule */
     margin: 20px 0; /* Ajouter une marge pour l'espacement vertical */
     font-family: 'Gellix', sans-serif; /* Utiliser une police claire */
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0;
 }
