@@ -1,4 +1,6 @@
+// Attendre le chargement complet du DOM avant d'exécuter le script
 document.addEventListener("DOMContentLoaded", () => {
+    // Charger les données des diamètres à partir du fichier JSON
     fetch('diameters.json')
         .then(response => {
             if (!response.ok) {
@@ -11,9 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const pipeTypeSelect = document.getElementById('pipeType');
             if (!pipeTypeSelect) {
-                throw new Error('Element with id "pipeType" not found in the DOM');
+                throw new Error('Élément avec l\'id "pipeType" introuvable dans le DOM');
             }
 
+            // Initialiser les options du sélecteur de type de tuyauterie
             pipeTypeSelect.innerHTML = '<option value="" disabled>Sélectionnez un type de tuyauterie</option>';
             const pipeTypes = Object.keys(data);
             pipeTypes.forEach(type => {
@@ -26,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 pipeTypeSelect.appendChild(option);
             });
 
+            // Ajouter un écouteur d'événement pour les changements de type de tuyauterie
             pipeTypeSelect.addEventListener('change', (event) => {
                 const selectedType = event.target.value;
                 const diameterTableBody = document.getElementById('diameterTableBody');
@@ -51,24 +55,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-            // Calculer les données du graphique une seule fois
+            // Générer et afficher les données initiales du graphique
             genererDonneesGraphique();
-            // Déclencher les calculs et l'affichage du graphique avec les valeurs par défaut
             calculerDiametre();
-            afficherGraphique();
-            mettreAJourGraphique(); // Mise en évidence initiale
-            const defaultPipeType = document.getElementById("pipeType").value;
-            mettreAJourEchelleY(defaultPipeType);
+            // Supprimer ou commenter l'appel à afficherGraphique si non défini
+            // afficherGraphique();
+            mettreAJourGraphique(); // Afficher le point mis en évidence initial
         })
-        .catch(error => console.error('Error loading diameters:', error));
+        .catch(error => console.error('Erreur lors du chargement des diamètres :', error));
 });
 
+// Empêcher le comportement par défaut du formulaire et mettre à jour le graphique lors de la soumission
 document.getElementById("inputForm").addEventListener("submit", event => {
     event.preventDefault();
     calculerDiametre();
     mettreAJourGraphique();
 });
 
+// Mettre à jour le graphique lors de l'entrée de Q_max
 document.getElementById("Q_max").addEventListener("input", () => {
     if (document.getElementById("pipeType").value) {
         calculerDiametre();
@@ -78,6 +82,7 @@ document.getElementById("Q_max").addEventListener("input", () => {
     }
 });
 
+// Mettre à jour le graphique et l'échelle lors du changement de type de tuyauterie
 document.getElementById("pipeType").addEventListener("change", (event) => {
     if (document.getElementById("Q_max").value) {
         calculerDiametre();
@@ -88,6 +93,7 @@ document.getElementById("pipeType").addEventListener("change", (event) => {
     mettreAJourEchelleY(event.target.value);
 });
 
+// Synchroniser le slider et le champ de saisie de Q_max
 document.getElementById("Q_max_input").addEventListener("input", (event) => {
     const value = event.target.value;
     document.getElementById("Q_max").value = value;
@@ -96,6 +102,15 @@ document.getElementById("Q_max_input").addEventListener("input", (event) => {
     mettreAJourGraphique();
 });
 
+document.getElementById("Q_max").addEventListener("input", (event) => {
+    const value = event.target.value;
+    document.getElementById("Q_max_input").value = value;
+    document.getElementById("Q_max_value").textContent = value;
+    calculerDiametre();
+    mettreAJourGraphique();
+});
+
+// Mettre à jour l'affichage de Q_max depuis le slider
 function updateQmaxValue(value) {
     document.getElementById("Q_max_value").textContent = value;
     document.getElementById("Q_max_input").value = value;
@@ -103,6 +118,7 @@ function updateQmaxValue(value) {
     mettreAJourGraphique();
 }
 
+// Mettre à jour la valeur de Q_max depuis le champ de saisie
 function updateQmaxRange(value) {
     document.getElementById("Q_max").value = value;
     document.getElementById("Q_max_value").textContent = value;
@@ -110,6 +126,7 @@ function updateQmaxRange(value) {
     mettreAJourGraphique();
 }
 
+// Calculer le diamètre en fonction du Q_max et du type de tuyauterie
 function calculerDiametre() {
     const Q_max_input = document.getElementById("Q_max").value;
     const pipeType = document.getElementById("pipeType").value;
@@ -127,7 +144,8 @@ function calculerDiametre() {
     const J_t = 0.3;
     const g = 9.81;
 
-    const d = Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 2 / 5);
+    // Calcul du diamètre basé sur la formule donnée
+    const d = Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 0.4);
     const d_mm = d * 1000;
 
     if (!window.diameters_data || !window.diameters_data[pipeType]) {
@@ -141,10 +159,11 @@ function calculerDiametre() {
         return;
     }
 
+    // Trouver le diamètre standard le plus proche supérieur ou égal au diamètre calculé
     let selected_diameter = null;
     for (const diameter of diameters) {
         if (diameter.ID_mm >= d_mm) {
-            selected_diameter = `DN: ${diameter.DN}, NPS: ${diameter.NPS}, ID: ${diameter.ID_mm} mm`;
+            selected_diameter = `ID ${diameter.ID_mm.toFixed(1)} mm | DN${diameter.DN} | NPS ${diameter.NPS}`;
             break;
         }
     }
@@ -152,30 +171,30 @@ function calculerDiametre() {
     document.getElementById("result").textContent = selected_diameter || "Aucun diamètre approprié trouvé";
 }
 
+// Générer les données pour le graphique
 function genererDonneesGraphique() {
     const J_t = 0.3;
     const g = 9.81;
 
-    // Générer les données pour le graphique une seule fois
     window.dataPoints = [];
-    for (let Q = 0; Q <= 500; Q += 5) {
+    for (let Q = 0; Q <= 500; Q += 1) {
         const Q_m3s = Q / 3600;
         const d_temp = Math.pow((4 * Q_m3s) / (Math.PI * J_t * Math.sqrt(g)), 0.4) * 1000;
         window.dataPoints.push({ x: Q, y: d_temp });
     }
 
-    // Créer le graphique
+    // Créer le graphique avec Chart.js
     const ctx = document.getElementById('chart').getContext('2d');
     window.myChart = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
-                label: 'd (ID) vs Qmax',
+                label: 'ID vs Qmax',
                 data: window.dataPoints,
                 borderColor: 'rgba(34, 183, 197, 1)',
                 backgroundColor: 'rgba(34, 183, 197, 0.2)',
                 fill: false,
-                pointRadius: 0, // Pas de points visibles
+                pointRadius: 0,
                 pointHoverRadius: 0,
                 showLine: true
             }]
@@ -188,7 +207,9 @@ function genererDonneesGraphique() {
                     title: {
                         display: true,
                         text: 'Qmax (m³/h)'
-                    }
+                    },
+                    min: 0,
+                    max: 500
                 },
                 y: {
                     title: {
@@ -196,19 +217,22 @@ function genererDonneesGraphique() {
                         text: 'd (ID) mm'
                     },
                     grid: {
-                        display: false // Enlever le quadrillage de l'axe Y
-                    }
+                        display: false
+                    },
+                    min: 0,
+                    max: 900
                 }
             },
             plugins: {
                 annotation: {
-                    annotations: {}
+                    annotations: {} // Initialement vide, sera rempli par mettreAJourGraphique
                 }
             }
         },
     });
 }
 
+// Mettre à jour le graphique avec les annotations basées sur Q_max et d
 function mettreAJourGraphique() {
     const Q_max_input = document.getElementById("Q_max").value;
     const pipeType = document.getElementById("pipeType").value;
@@ -227,156 +251,161 @@ function mettreAJourGraphique() {
     const J_t = 0.3;
     const g = 9.81;
 
+    // Calculer le diamètre correspondant
     const d = Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 0.4);
     const d_mm = d * 1000;
 
-    // Mettre à jour l'échelle Y et obtenir les IDs adjacents
-    const { lowerID, upperID, scaleUpdated } = mettreAJourEchelleY(pipeType, d_mm);
+    // Initialiser les annotations avec le point et les lignes correspondantes
+    const annotations = {
+        point: {
+            type: 'point',
+            xValue: parseFloat(Q_max_input),
+            yValue: d_mm,
+            backgroundColor: 'rgba(34, 183, 197, 1)',
+            radius: 5,
+            borderColor: 'rgba(34, 183, 197, 1)',
+            borderWidth: 2,
+            label: {
+                content: `Qmax: ${Q_max_input} m³/h, d: ${d_mm.toFixed(2)} mm`,
+                enabled: true,
+                position: 'top'
+            }
+        },
+        xLine: {
+            type: 'line',
+            xMin: parseFloat(Q_max_input),
+            xMax: parseFloat(Q_max_input),
+            yMin: 0,
+            yMax: d_mm,
+            borderColor: 'rgba(34, 183, 197, 1)',
+            borderWidth: 3,
+            borderDash: [6, 6]
+        },
+        yLine: {
+            type: 'line',
+            xMin: 0,
+            xMax: parseFloat(Q_max_input),
+            yMin: d_mm,
+            yMax: d_mm,
+            borderColor: 'rgba(34, 183, 197, 1)', // Changé de 'red' au turquoise
+            borderWidth: 3,
+            borderDash: [6, 6]
+        }
+    };
 
-    // Mettre à jour les annotations du graphique uniquement si l'échelle a été mise à jour
-    if (scaleUpdated) {
-        window.myChart.options.plugins.annotation.annotations = {
-            point: {
-                type: 'point',
-                xValue: parseFloat(Q_max_input),
-                yValue: d_mm,
-                backgroundColor: 'red',
-                radius: 3,
-                borderColor: 'red',
-                borderWidth: 2,
-                label: {
-                    content: `Qmax: ${Q_max_input} m³/h, d: ${d_mm.toFixed(2)} mm`,
-                    enabled: true,
-                    position: 'top'
-                }
-            },
-            xLine: {
-                type: 'line',
-                xMin: parseFloat(Q_max_input),
-                xMax: parseFloat(Q_max_input),
-                yMin: 0,
-                yMax: d_mm,
-                borderColor: 'red',
-                borderWidth: 1,
-                borderDash: [6, 6]
-            },
-            yLine: {
-                type: 'line',
-                xMin: 0,
-                xMax: parseFloat(Q_max_input),
-                yMin: d_mm,
-                yMax: d_mm,
-                borderColor: 'red',
-                borderWidth: 1,
-                borderDash: [6, 6]
-            },
-            // Ajout des lignes adjacentes
-            ...(lowerID && {
-                lineLower: {
-                    type: 'line',
-                    yMin: lowerID,
-                    yMax: lowerID,
-                    xMin: 0,
-                    xMax: 500,
-                    borderColor: 'rgba(0, 0, 0, 0.9)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    label: {
-                        content: `${lowerID} mm`,
-                        enabled: true,
-                        position: 'start',
-                        backgroundColor: 'rgba(255,255,255,0.7)',
-                        color: '#000',
-                        font: {
-                            size: 10
-                        },
-                        yAdjust: -10
-                    }
-                }
-            }),
-            ...(upperID && {
-                lineUpper: {
-                    type: 'line',
-                    yMin: upperID,
-                    yMax: upperID,
-                    xMin: 0,
-                    xMax: 500,
-                    borderColor: 'rgba(0, 0, 0, 0.9)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    label: {
-                        content: `${upperID} mm`,
-                        enabled: true,
-                        position: 'start',
-                        backgroundColor: 'rgba(255,255,255,0.7)',
-                        color: '#000',
-                        font: {
-                            size: 10
-                        },
-                        yAdjust: -10
-                    }
-                }
-            })
-        };
-
-        window.myChart.update();
-    }
-
-    // Afficher les valeurs en x et y du point mis en évidence
-    document.getElementById("highlightedPoint").textContent = `Point mis en évidence - Qmax: ${Q_max_input} m³/h, d: ${d_mm.toFixed(2)} mm`;
-}
-
-function mettreAJourEchelleY(pipeType, d_mm) {
-    if (!window.diameters_data || !window.diameters_data[pipeType]) {
-        return { lowerID: null, upperID: null, scaleUpdated: false };
-    }
-
+    // Ajouter des lignes noires pour chaque ID_mm existant du type de tuyauterie sélectionné
     const diameters = window.diameters_data[pipeType];
-    if (!diameters || !Array.isArray(diameters)) {
-        return { lowerID: null, upperID: null, scaleUpdated: false };
-    }
+    diameters.forEach((diameter, index) => {
+        annotations[`idLine${index}`] = {
+            type: 'line',
+            borderColor: 'black',
+            borderWidth: 1,
+            borderDash: [2, 2],
+            xMin: 0,
+            xMax: 500,
+            yMin: diameter.ID_mm,
+            yMax: diameter.ID_mm,
+            label: {
+                content: `${diameter.ID_mm.toFixed(1)} mm | DN${diameter.DN} | NPS ${diameter.NPS}`,
+                enabled: true,
+                position: 'end'
+            }
+        };
+    });
 
-    // Find the adjacent ID values
-    let lowerID = null;
-    let upperID = null;
+    // Trouver le prochain diamètre standard supérieur
+    let nextDiameter = null;
     for (const diameter of diameters) {
-        if (diameter.ID_mm >= d_mm) {
-            upperID = diameter.ID_mm;
+        if (diameter.ID_mm > d_mm) {
+            nextDiameter = diameter;
             break;
         }
-        lowerID = diameter.ID_mm;
     }
 
-    // Check if the current d_mm is within the existing interval
-    const currentMin = window.myChart.options.scales.y.min;
-    const currentMax = window.myChart.options.scales.y.max;
-    const scaleUpdated = !(d_mm >= currentMin && d_mm <= currentMax);
-
-    if (scaleUpdated) {
-        // Update the Y scale of the chart
-        window.myChart.options.scales.y = {
-            type: 'linear',
-            title: {
-                display: true,
-                text: 'd (ID) mm'
-            },
-            grid: {
-                display: false // Enlever le quadrillage de l'axe Y
-            },
-            min: lowerID ? lowerID - 10 : 0,
-            max: upperID ? upperID + 10 : d_mm + 10
+    if (nextDiameter) {
+        annotations.nextStandardPoint = {
+            type: 'point',
+            xValue: parseFloat(Q_max_input),
+            yValue: nextDiameter.ID_mm,
+            backgroundColor: 'green',
+            radius: 5,
+            borderColor: 'green',
+            borderWidth: 2,
+            label: {
+                content: `Prochain ID standard: ${nextDiameter.ID_mm} mm`,
+                enabled: true,
+                position: 'top'
+            }
         };
-
-        // Remove previous horizontal lines except annotations for Qmax
-        const existingLines = Object.keys(window.myChart.options.plugins.annotation.annotations).filter(key => key.startsWith('line'));
-        existingLines.forEach(key => {
-            delete window.myChart.options.plugins.annotation.annotations[key];
-        });
+        // Ajouter la ligne horizontale verte
+        annotations.nextStandardLine = {
+            type: 'line',
+            xMin: parseFloat(Q_max_input),
+            xMax: 500,
+            yMin: nextDiameter.ID_mm,
+            yMax: nextDiameter.ID_mm,
+            borderColor: 'green',
+            borderWidth: 3,
+            label: {
+                content: `${nextDiameter.ID_mm.toFixed(1)} mm | DN${nextDiameter.DN} | NPS ${nextDiameter.NPS}`,
+                enabled: true,
+                position: 'end',
+                backgroundColor: 'green'
+            }
+        };
     }
 
-    return { lowerID, upperID, scaleUpdated };
+    // Trouver le prochain diamètre standard inférieur
+    let previousDiameter = null;
+    for (let i = diameters.length - 1; i >= 0; i--) {
+        if (diameters[i].ID_mm < d_mm) {
+            previousDiameter = diameters[i];
+            break;
+        }
+    }
+
+    if (previousDiameter) {
+        annotations.previousStandardPoint = {
+            type: 'point',
+            xValue: parseFloat(Q_max_input),
+            yValue: previousDiameter.ID_mm,
+            backgroundColor: 'red',
+            radius: 5,
+            borderColor: 'red',
+            borderWidth: 2,
+        };
+        // Ajouter la ligne horizontale rouge
+        annotations.previousStandardLine = {
+            type: 'line',
+            xMin: parseFloat(Q_max_input),
+            xMax: 500,
+            yMin: previousDiameter.ID_mm,
+            yMax: previousDiameter.ID_mm,
+            borderColor: 'red',
+            borderWidth: 3,
+        };
+    }
+
+    // Calculer les nouvelles limites pour les axes
+    const newXMin = Math.max(parseFloat(Q_max_input) - 25, 0);
+    const newXMax = Math.min(parseFloat(Q_max_input) + 25, 500);
+    const newYMin = Math.max(d_mm - 100, 0);
+    const newYMax = Math.min(d_mm + 100, 900);
+
+    // Mettre à jour les options des axes
+    window.myChart.options.scales.x.min = newXMin;
+    window.myChart.options.scales.x.max = newXMax;
+    window.myChart.options.scales.y.min = newYMin;
+    window.myChart.options.scales.y.max = newYMax;
+
+    // Mettre à jour les annotations du graphique
+    window.myChart.options.plugins.annotation.annotations = annotations;
+
+    // Mettre à jour le graphique
+    window.myChart.update();
 }
 
+// Afficher les diamètres standards pour le type de tuyauterie sélectionné
 function afficherDiametresStandards(pipeType) {
     if (!window.diameters_data || !window.diameters_data[pipeType]) {
         alert("Les données des diamètres ne sont pas disponibles.");

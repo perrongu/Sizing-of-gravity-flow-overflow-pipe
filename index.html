@@ -12,26 +12,26 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
 </head>    
 <body>
-    <h1>Calcul du Diamètre d'un overflow de réservoir atmosphérique</h1>
+    <h1>Calcul du Diamètre d'un overflow gravitaire auto-ventilé</h1>
 
-    <h2>Données requises</h2>
-    <form id="inputForm">
-        <label for="Q_max">Débit volumique maximal (Q_max) en m³/h :</label>
-        <input type="range" id="Q_max" name="Q_max" min="0" max="500" step="1" value="50" oninput="updateQmaxValue(this.value)">
-        <span id="Q_max_value">50</span> m³/h
-        <input type="number" id="Q_max_input" name="Q_max_input" min="0" max="500" step="1" value="50" oninput="updateQmaxRange(this.value)">
-        
-        <label for="pipeType">Type de tuyauterie :</label>
-        <select id="pipeType" name="pipeType" required>
-            <option value="" disabled>Sélectionnez un type de tuyauterie</option>
-            <option value="Steel_SCH40" selected>Steel_SCH40</option>
-        </select>        
-    </form>
-
-    <h2>Graphique ID vs Qmax</h2>
-    <div class="chart-container">
-        <canvas id="chart"></canvas>
+    <h2>Spécification du débit et du type de tuyauterie</h2>
+    <div class="form-chart-container">
+        <form id="inputForm">
+            <label for="Q_max">Débit volumique \( Q_{\text{max}} \) (m³/h) :</label>
+            <input type="range" id="Q_max" name="Q_max" min="0" max="500" step="1" value="50" oninput="updateQmaxValue(this.value)">
+            <input type="number" id="Q_max_input" name="Q_max_input" min="0" max="500" step="1" value="50" oninput="updateQmaxRange(this.value)">
+            
+            <label for="pipeType">Type de tuyauterie :</label>
+            <select id="pipeType" name="pipeType" required>
+                <option value="" disabled>Sélectionnez un type de tuyauterie</option>
+                <option value="Steel_SCH40" selected>Steel_SCH40</option>
+            </select>        
+        </form>
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
     </div>
+
     <p id="highlightedPoint"></p>
 
     <h2>Résultat</h2>

@@ -70,7 +70,7 @@ form {
     padding: 20px; /* Ajouter une marge intérieure au formulaire pour l'espacement */
     border-radius: 8px; /* Coins arrondis pour un aspect plus doux */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre subtile pour ajouter de la profondeur */
-    max-width: 600px; /* Limiter la largeur du formulaire pour une meilleure mise en page */
+    max-width: 300px; /* Limiter la largeur du formulaire pour une meilleure mise en page */
     margin-bottom: 20px; /* Ajouter un espacement en dessous du formulaire */
     font-family: 'Century Gothic', sans-serif; /* Utiliser une police différente pour les formulaires */
     display: flex;
@@ -79,8 +79,13 @@ form {
 }
 
 form label, form input, form select {
-    flex: 1 1 100%;
+    flex: 1 1 48%; /* Ajuster la largeur pour les aligner côte à côte */
     margin-bottom: 10px;
+    margin-right: 2%; /* Ajouter un espace entre les champs */
+}
+
+form label:nth-child(odd), form input:nth-child(odd), form select:nth-child(odd) {
+    margin-right: 0; /* Supprimer l'espace à droite pour les éléments impairs */
 }
 
 form button {
@@ -190,6 +195,20 @@ td {
 
 .chart-container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 800px;
     margin: 0;
+}
+
+.form-chart-container {
+    display: grid;
+    grid-template-columns: 1fr 4fr; /* Ajuster les largeurs des colonnes */
+    gap: 20px; /* Espacement réduit entre le formulaire et le graphique */
+}
+
+form#inputForm {
+    flex: 1 1 30%; /* Ajuster la largeur du formulaire */
+}
+
+.chart-container {
+    flex: 1 1 65%; /* Ajuster la largeur du graphique */
 }
