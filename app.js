@@ -29,9 +29,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 pipeTypeSelect.appendChild(option);
             });
 
+            // Générer diameterTableBody au chargement initial
+            const diameterTableBody = document.getElementById('diameterTableBody');
+            const initialDiameters = afficherDiametresStandards('Steel_SCH40');
+            initialDiameters.forEach(item => {
+                const row = document.createElement('tr');
+
+                const dnCell = document.createElement('td');
+                dnCell.textContent = item.DN;
+                row.appendChild(dnCell);
+
+                const npsCell = document.createElement('td');
+                npsCell.textContent = item.NPS;
+                row.appendChild(npsCell);
+
+                const idCell = document.createElement('td');
+                idCell.textContent = `${item.ID_mm} mm`;
+                row.appendChild(idCell);
+
+                diameterTableBody.appendChild(row);
+            });
+
             // Ajouter un écouteur d'événement pour les changements de type de tuyauterie
             pipeTypeSelect.addEventListener('change', (event) => {
                 const selectedType = event.target.value;
+                mettreAJourTitreDiametres(selectedType);
+                
                 const diameterTableBody = document.getElementById('diameterTableBody');
                 diameterTableBody.innerHTML = ''; // Vider la table précédente
 
@@ -53,6 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     diameterTableBody.appendChild(row);
                 });
+
+                // Recalculer le diamètre et mettre à jour le graphique après le changement de type
+                calculerDiametre();
+                mettreAJourGraphique();
             });
 
             // Générer et afficher les données initiales du graphique
@@ -63,6 +90,23 @@ document.addEventListener("DOMContentLoaded", () => {
             mettreAJourGraphique(); // Afficher le point mis en évidence initial
         })
         .catch(error => console.error('Erreur lors du chargement des diamètres :', error));
+
+    // Ajouter l'écouteur pour le bouton de bascule
+    const toggleButton = document.getElementById("toggleTable");
+    const diameterTable = document.getElementById("diameterTable");
+
+    toggleButton.addEventListener("click", () => {
+        diameterTable.classList.toggle("collapsed");
+        if (diameterTable.classList.contains("collapsed")) {
+            toggleButton.textContent = "Afficher les diamètres standards";
+        } else {
+            toggleButton.textContent = "Masquer les diamètres standards";
+        }
+    });
+
+    // Appeler la fonction lors du chargement initial avec le type par défaut
+    mettreAJourTitreDiametres('Steel_SCH40');
+    calculerDiametre();
 });
 
 // Empêcher le comportement par défaut du formulaire et mettre à jour le graphique lors de la soumission
@@ -126,6 +170,9 @@ function updateQmaxRange(value) {
     mettreAJourGraphique();
 }
 
+let selectedID_mm = null; // Variable pour stocker l'ID_mm sélectionné
+let selectedDN = null; // Nouvelle variable pour stocker le DN sélectionné
+
 // Calculer le diamètre en fonction du Q_max et du type de tuyauterie
 function calculerDiametre() {
     const Q_max_input = document.getElementById("Q_max").value;
@@ -144,7 +191,6 @@ function calculerDiametre() {
     const J_t = 0.3;
     const g = 9.81;
 
-    // Calcul du diamètre basé sur la formule donnée
     const d = Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 0.4);
     const d_mm = d * 1000;
 
@@ -159,16 +205,46 @@ function calculerDiametre() {
         return;
     }
 
-    // Trouver le diamètre standard le plus proche supérieur ou égal au diamètre calculé
     let selected_diameter = null;
+    selectedID_mm = null;
+    selectedDN = null;
     for (const diameter of diameters) {
         if (diameter.ID_mm >= d_mm) {
-            selected_diameter = `ID ${diameter.ID_mm.toFixed(1)} mm | DN${diameter.DN} | NPS ${diameter.NPS}`;
+            selected_diameter = diameter;
+            selectedID_mm = diameter.ID_mm;
+            selectedDN = diameter.DN;
             break;
         }
     }
 
-    document.getElementById("result").textContent = selected_diameter || "Aucun diamètre approprié trouvé";
+    document.getElementById("result").textContent = selected_diameter 
+        ? `ID ${selected_diameter.ID_mm.toFixed(1)} mm | DN${selected_diameter.DN} | NPS ${selected_diameter.NPS}` 
+        : "Aucun diamètre approprié trouvé";
+
+    // Mettre à jour la mise en évidence dans la table
+    mettreEnEvidenceTable();
+}
+
+// Mettre à jour la ligne sélectionnée dans la table
+function mettreEnEvidenceTable() {
+    const diameterTableBody = document.getElementById('diameterTableBody');
+    const rows = diameterTableBody.getElementsByTagName('tr');
+
+    // Supprimer toutes les mises en évidence précédentes
+    Array.from(rows).forEach(row => {
+        row.classList.remove('highlighted');
+    });
+
+    // Ajouter la mise en évidence à la ligne correspondante
+    Array.from(rows).forEach(row => {
+        const dnCell = row.cells[0]; // La cellule DN est la première cellule
+        if (dnCell) {
+            const dnValue = parseFloat(dnCell.textContent);
+            if (dnValue === selectedDN) {
+                row.classList.add('highlighted');
+            }
+        }
+    });
 }
 
 // Générer les données pour le graphique
@@ -238,12 +314,12 @@ function mettreAJourGraphique() {
     const pipeType = document.getElementById("pipeType").value;
 
     if (!Q_max_input || isNaN(Q_max_input) || parseFloat(Q_max_input) <= 0) {
-        document.getElementById("highlightedPoint").textContent = "Veuillez entrer un débit volumique maximal valide.";
+        // document.getElementById("highlightedPoint").textContent = "Veuillez entrer un débit volumique maximal valide.";
         return;
     }
 
     if (!pipeType) {
-        document.getElementById("highlightedPoint").textContent = "Veuillez sélectionner un type de tuyauterie.";
+        // document.getElementById("highlightedPoint").textContent = "Veuillez sélectionner un type de tuyauterie.";
         return;
     }
 
@@ -355,37 +431,6 @@ function mettreAJourGraphique() {
         };
     }
 
-    // Trouver le prochain diamètre standard inférieur
-    let previousDiameter = null;
-    for (let i = diameters.length - 1; i >= 0; i--) {
-        if (diameters[i].ID_mm < d_mm) {
-            previousDiameter = diameters[i];
-            break;
-        }
-    }
-
-    if (previousDiameter) {
-        annotations.previousStandardPoint = {
-            type: 'point',
-            xValue: parseFloat(Q_max_input),
-            yValue: previousDiameter.ID_mm,
-            backgroundColor: 'red',
-            radius: 5,
-            borderColor: 'red',
-            borderWidth: 2,
-        };
-        // Ajouter la ligne horizontale rouge
-        annotations.previousStandardLine = {
-            type: 'line',
-            xMin: parseFloat(Q_max_input),
-            xMax: 500,
-            yMin: previousDiameter.ID_mm,
-            yMax: previousDiameter.ID_mm,
-            borderColor: 'red',
-            borderWidth: 3,
-        };
-    }
-
     // Calculer les nouvelles limites pour les axes
     const newXMin = Math.max(parseFloat(Q_max_input) - 25, 0);
     const newXMax = Math.min(parseFloat(Q_max_input) + 25, 500);
@@ -419,4 +464,20 @@ function afficherDiametresStandards(pipeType) {
     }
 
     return diameters;
+}
+
+// Fonction pour mettre à jour le titre des diamètres standards
+function mettreAJourTitreDiametres(pipeType) {
+    const titleElement = document.getElementById("diameterTitle");
+    titleElement.textContent = `Diamètres intérieurs standards pour la spécification ${pipeType}`;
+}
+
+// Mettre à jour les équations avec les nouvelles valeurs
+function mettreAJourEquations(Q_max_input, Q_max, d, d_mm, selected_diameter) {
+    // ...existing code updating the equations...
+    
+    // Recharger MathJax pour le rendu des équations
+    if (window.MathJax) {
+        MathJax.typeset();
+    }
 }

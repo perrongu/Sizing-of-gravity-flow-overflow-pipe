@@ -212,3 +212,55 @@ form#inputForm {
 .chart-container {
     flex: 1 1 65%; /* Ajuster la largeur du graphique */
 }
+
+.note {
+    font-size: 10pt; /* Taille de police plus petite */
+    font-style: italic; /* Style italique */
+    color: #555; /* Couleur grise subtile */
+    border-left: 4px solid var(--turquoise); /* Encadré subtil à gauche */
+    padding-left: 30px; /* Augmenter l'espacement à gauche pour l'icône */
+    background-color: #f0f8ff; /* Fond légèrement coloré */
+    position: relative; /* Pour positionner l'icône */
+    margin-left: 20px; /* Déplacer la note vers la droite */
+}
+
+.note::before {
+    content: "ℹ️"; /* Icône d'information */
+    position: absolute;
+    left: -30px; /* Ajuster la position de l'icône pour correspondre au nouveau padding */
+    top: 2px; /* Ajuster l'alignement vertical de l'icône */
+    font-size: 12pt; /* Taille de l'icône */
+    color: var(--turquoise); /* Couleur de l'icône */
+}
+
+/* Classe pour masquer la table */
+.collapsed {
+    display: none;
+}
+
+/* Style pour le bouton de bascule */
+.toggle-button {
+    background-color: var(--turquoise);
+    color: var(--white);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-family: 'Gellix', sans-serif;
+    font-weight: bold;
+}
+
+.toggle-button:hover {
+    background-color: #1da7b8;
+}
+
+.highlighted {
+    font-weight: bold; /* Poids gras pour l'accentuation */
+    /* background-color: green; Commenté car remplacé par la règle ci-dessous */
+}
+
+.highlighted td {
+    background-color: green; /* Définir la couleur de fond en vert */
+    color: var(--white); /* Définir la couleur du texte en blanc */
+}

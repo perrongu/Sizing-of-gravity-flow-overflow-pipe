@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dimension d'un overflow</title>
+    <title>Overflow gravitaire</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -32,37 +32,40 @@
         </div>
     </div>
 
-    <p id="highlightedPoint"></p>
+    <div>
+        <h2>Résultat</h2>
+        <p>
+            Le plus petit diamètre standard supérieur au diamètre calculé est :
+            <strong id="result"></strong>
+        </p>
+        <p class="note">
+            Le diamètre de la tuyère doit être égal ou supérieur au diamètre calculé pour assurer un bon fonctionnement.
+        </p>
+    </div>
 
-    <h2>Résultat</h2>
-    <p>
-        Le plus petit diamètre standard supérieur au diamètre calculé est :
-        <strong id="result"></strong>
-    </p>
+    <div>
+        <h2>Détails du calcul</h2>
+        <div id="calculationDetails">
+            <p>Le diamètre de l'overflow gravitaire auto-ventilé est calculé en fonction du débit volumique maximal \( Q_{\text{max}} \) et du type de tuyauterie.</p>
+        </div>
+    </div>
 
-    <h2>Calcul du Diamètre d</h2>
-    <p>
-        La formule pour le calcul du diamètre est : \( d = \left( \frac{4 \cdot Q_{\text{max}}}{0.3 \pi \sqrt{g}} \right)^{0.4} \)
-    </p>
-
-    <h2>Conversion en mm</h2>
-    <p>
-        Diamètre calculé (d) converti en mm : d_mm = d * 1000
-    </p>
-
-    <h2>Diamètres Intérieurs Standards</h2>
-    <p>Diamètres intérieurs standards pour les conduites :</p>
-    <table id="diameterTable">
-        <thead>
-            <tr>
-                <th>DN</th>
-                <th>NPS</th>
-                <th>Diamètre Intérieur (ID) mm</th>
-            </tr>
-        </thead>
-        <tbody id="diameterTableBody">
-        </tbody>
-    </table>
+    <div>
+        <h2 id="diameterTitle">Diamètres Intérieurs Standards</h2>
+        <button class="toggle-button" id="toggleTable">Afficher les diamètres standards</button>
+        <p>Diamètres intérieurs standards pour les conduites :</p>
+        <table id="diameterTable" class="collapsed">
+            <thead>
+                <tr>
+                    <th>DN</th>
+                    <th>NPS</th>
+                    <th>Diamètre Intérieur (ID) mm</th>
+                </tr>
+            </thead>
+            <tbody id="diameterTableBody">
+            </tbody>
+        </table>
+    </div>
 
     <footer>
         <h3>Références</h3>
