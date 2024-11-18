@@ -63,6 +63,29 @@ document.addEventListener("DOMContentLoaded", () => {
             mettreAJourGraphique(); // Afficher le point mis en évidence initial
         })
         .catch(error => console.error('Erreur lors du chargement des diamètres :', error));
+
+    // Ajouter une fonction pour mettre à jour dynamiquement l'équation basée sur Q_max
+    function updateDiameterFormula() {
+        const Q_max = document.getElementById('Q_max').value;
+        const diameterFormula = document.getElementById('diameterFormula');
+        const formula = `d = \\left( \\frac{4 \\cdot ${Q_max}}{0.3 \\pi \\sqrt{g}} \\right)^{0.4}`;
+        diameterFormula.innerHTML = `\\( ${formula} \\)`;
+        MathJax.typeset();
+    }
+
+    // Intégrer la mise à jour de l'équation dans les écouteurs d'événements existants
+    document.getElementById("Q_max").addEventListener("input", () => {
+        // ...existing code...
+        updateDiameterFormula();
+    });
+
+    document.getElementById("Q_max_input").addEventListener("input", (event) => {
+        // ...existing code...
+        updateDiameterFormula();
+    });
+
+    // Appeler la fonction initialement pour le rendu initial
+    updateDiameterFormula();
 });
 
 // Empêcher le comportement par défaut du formulaire et mettre à jour le graphique lors de la soumission
