@@ -104,6 +104,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Initialiser la valeur de Q_max à 50
+    const QmaxInput = document.getElementById("Q_max");
+    QmaxInput.value = 50;
+    document.getElementById("Q_max_input").value = 50;
+    document.getElementById("Q_max_value").textContent = 50;
+
     // Appeler la fonction lors du chargement initial avec le type par défaut
     mettreAJourTitreDiametres('Steel_SCH40');
     calculerDiametre();
@@ -220,6 +226,9 @@ function calculerDiametre() {
     document.getElementById("result").textContent = selected_diameter 
         ? `ID ${selected_diameter.ID_mm.toFixed(1)} mm | DN${selected_diameter.DN} | NPS ${selected_diameter.NPS}` 
         : "Aucun diamètre approprié trouvé";
+
+    // Appeler mettreAJourEquations pour générer la démarche pas à pas
+    mettreAJourEquations(Q_max_input, Q_max, d, d_mm, selected_diameter);
 
     // Mettre à jour la mise en évidence dans la table
     mettreEnEvidenceTable();
@@ -476,8 +485,33 @@ function mettreAJourTitreDiametres(pipeType) {
 function mettreAJourEquations(Q_max_input, Q_max, d, d_mm, selected_diameter) {
     // ...existing code updating the equations...
     
+    // Passer Q_max_input à la fonction générerDemarchePasAPas
+    genererDemarchePasAPas(Q_max_input, Q_max, d, d_mm);
+    
     // Recharger MathJax pour le rendu des équations
     if (window.MathJax) {
         MathJax.typeset();
     }
+}
+
+// Fonction pour générer la démarche pas à pas des calculs
+function genererDemarchePasAPas(Q_max_input, Q_max, d, d_mm) {
+    const stepContainer = document.getElementById('stepByStep');
+    stepContainer.innerHTML = `
+        <h3>Calcul du diamètre minimum requis</h3>
+        <ol>
+            <li>
+                Calcul du débit volumique en m³/s :
+                $$ Q = \\frac{${Q_max_input} \\, \\text{m}³/\\text{h}}{3600} = ${ (Q_max_input / 3600).toFixed(4) } \\, \\text{m}³/\\text{s} $$
+            </li>
+            <li>
+                Application de la formule pour le diamètre :
+                $$ d = \\left( \\frac{4Q}{\\pi J_t \\sqrt{g}} \\right)^{0.4} = \\left( \\frac{4 \\times ${ Q_max.toFixed(4) } }{\\pi \\times 0.3 \\times \\sqrt{9.81}} \\right)^{0.4} \\approx ${ d.toFixed(4) } \\, \\text{m} $$
+            </li>
+            <li>
+                Conversion en millimètres :
+                $$ d_{mm} = ${ d.toFixed(4) } \\, \\text{m} \\times 1000 = ${ d_mm.toFixed(2) } \\, \\text{mm} $$
+            </li>
+        </ol>
+    `;
 }
