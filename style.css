@@ -1,12 +1,15 @@
+/* Variables CSS */
 :root {
-    --blue-marine: #002952; /* Couleur bleue primaire utilisée pour les éléments de la marque */
-    --turquoise: #22B7C5; /* Couleur turquoise secondaire utilisée pour les accents */
-    --lichen: #2D6E57; /* Couleur verte lichen utilisée pour les étiquettes et les titres */
-    --sable: #CB9B5D; /* Couleur sable utilisée pour les éléments de liste */
-    --white: #f8f8f8; /* Couleur blanche utilisée pour les arrière-plans */
-    --black: #080808; /* Couleur noire utilisée pour le texte et les états au survol */
+    /* Couleurs de base du thème */
+    --black: #080808;
+    --blue-marine: #002952;
+    --lichen: #2D6E57;
+    --sable: #CB9B5D;
+    --turquoise: #22B7C5;
+    --white: #f8f8f8;
 }
 
+/* Typographie et disposition du corps */
 body {
     font-family: 'Gellix', sans-serif; /* Police principale pour l'ensemble du document */
     background-color: var(--white); /* Définir la couleur de fond sur blanc */
@@ -15,7 +18,8 @@ body {
     padding: 20px; /* Ajouter une marge intérieure autour du contenu du body */
 }
 
-h1 {
+/* Styles des titres principaux */
+h1, .title {
     color: var(--blue-marine); /* Définir la couleur bleue primaire pour les éléments h1 */
     font-size: 32pt; /* Taille de police plus appropriée pour un document Word */
     font-weight: 300; /* Poids léger pour un aspect moins gras */
@@ -23,7 +27,8 @@ h1 {
     letter-spacing: 0; /* Pas d'espacement supplémentaire entre les lettres */
 }
 
-h2 {
+/* Styles des sous-titres */
+h2, .subtitle {
     color: var(--turquoise); /* Définir la couleur turquoise pour les éléments h2 */
     font-size: 24pt; /* Taille de police adaptée pour des sous-titres dans un document Word */
     font-weight: 500; /* Poids moyen pour un meilleur accent */
@@ -31,6 +36,7 @@ h2 {
     letter-spacing: 0; /* Pas d'espacement supplémentaire entre les lettres */
 }
 
+/* Styles des titres de niveau 3 */
 h3 {
     color: var(--lichen); /* Définir la couleur lichen pour les éléments h3 */
     font-family: 'Gellix', sans-serif; /* Utiliser la police principale */
@@ -39,32 +45,25 @@ h3 {
     margin-bottom: 20px; /* Ajouter un espacement en dessous du titre */
 }
 
-ul {
-    list-style-type: disc; /* Utiliser des puces de type disque pour les listes non ordonnées */
-    padding-left: 20px; /* Ajouter une marge à gauche pour aligner les éléments de liste */
-    color: var(--sable); /* Définir la couleur sable pour les éléments de liste */
-}
-
-.title {
-    font-family: 'Gellix', sans-serif; /* Utiliser la police principale */
-    font-size: 32pt; /* Même taille que h1 pour une cohérence des titres */
-    font-weight: 300; /* Poids léger pour un aspect moins gras */
-    line-height: 1.2; /* Ajuster l'interligne pour la lisibilité */
-}
-
-.subtitle {
-    font-family: 'Gellix', sans-serif; /* Utiliser la police principale */
-    font-size: 24pt; /* Même taille que h2 pour une cohérence des sous-titres */
-    font-weight: 500; /* Poids moyen pour l'accentuation */
-    line-height: 1.2; /* Ajuster l'interligne pour la lisibilité */
-}
-
+/* Contenu textuel principal */
 .text-content {
     font-family: 'Gellix', sans-serif; /* Utiliser la police principale */
     font-size: 12pt; /* Taille standard pour le texte principal dans un document Word */
     line-height: 1.5; /* Définir l'interligne pour améliorer la lisibilité */
 }
 
+/* Styles des listes */
+ul {
+    list-style-type: disc; /* Utiliser des puces de type disque pour les listes non ordonnées */
+    padding-left: 40px; /* Ajouter une marge à gauche pour aligner les éléments de liste */
+    color: var(--sable); /* Définir la couleur sable pour les éléments de liste */
+}
+
+ul, ol {
+    color: var(--black); /* Définir la même couleur sable pour les listes non ordonnées et ordonnées */
+}
+
+/* Styles des formulaires */
 form {
     background-color: var(--white); /* Arrière-plan blanc pour le formulaire */
     padding: 20px; /* Ajouter une marge intérieure au formulaire pour l'espacement */
@@ -85,45 +84,24 @@ form label, form input, form select {
 }
 
 form label:nth-child(odd), form input:nth-child(odd), form select:nth-child(odd) {
-    margin-right: 0; /* Supprimer l'espace à droite pour les éléments impairs */
+    /* Styles pour les éléments impairs du formulaire */
 }
 
+/* Correction du bloc manquant */
 form button {
     flex: 0 1 auto;
     margin-left: auto;
 }
 
-label {
-    display: block; /* S'assurer que l'étiquette prend toute la largeur */
-    margin-bottom: 10px; /* Ajouter un espacement en dessous de l'étiquette */
-    font-weight: bold; /* Poids gras pour une meilleure visibilité */
-    color: var(--lichen); /* Définir la couleur lichen pour les étiquettes */
-}
-
-input[type="number"] {
-    width: 100%; /* Faire en sorte que le champ de saisie prenne toute la largeur */
-    padding: 10px; /* Ajouter une marge intérieure au champ de saisie */
-    margin-bottom: 20px; /* Ajouter un espacement en dessous du champ de saisie */
-    border: 1px solid #ccc; /* Bordure grise claire pour le champ de saisie */
-    border-radius: 4px; /* Coins arrondis pour le champ de saisie */
-}
-
-#Q_max_input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-button {
+/* Styles des boutons */
+button, .button-primary, .toggle-button {
     background-color: var(--blue-marine); /* Définir la couleur bleue primaire pour les boutons */
-    color: var(--white); /* Couleur de texte blanche pour le contraste */
-    padding: 10px 20px; /* Ajouter une marge intérieure au bouton */
-    border: none; /* Supprimer la bordure par défaut */
-    border-radius: 4px; /* Coins arrondis pour le bouton */
-    cursor: pointer; /* Curseur en forme de main pour indiquer la cliquabilité */
-    transition: background-color 0.3s ease; /* Transition douce de la couleur au survol */
+    color: var(--white); /* Couleur du texte des boutons */
+    padding: 8px 16px; /* Padding pour les boutons */
+    border: none; /* Supprimer les bordures par défaut */
+    border-radius: 4px; /* Coins arrondis */
+    cursor: pointer; /* Curseur pointeur au survol */
+    margin-bottom: 10px; /* Espacement en bas */
     font-family: 'Gellix', sans-serif; /* Utiliser la police principale */
     font-weight: bold; /* Poids gras pour l'accentuation */
 }
@@ -132,65 +110,49 @@ button:hover {
     background-color: #001B36; /* Assombrir la couleur du bouton au survol */
 }
 
-.button-primary {
-    background-color: var(--blue-marine); /* Définir la couleur bleue primaire pour les boutons principaux */
-    color: var(--white); /* Couleur de texte blanche pour le contraste */
-    padding: 10px 20px; /* Ajouter une marge intérieure au bouton */
-    border-radius: 4px; /* Coins arrondis pour le bouton */
-    text-transform: uppercase; /* Texte en majuscules pour l'accentuation */
-    font-weight: bold; /* Poids gras pour l'accentuation */
-}
-
 .button-primary:hover {
     background-color: var(--black); /* Définir la couleur noire au survol pour les boutons principaux */
 }
 
-#result {
-    font-weight: bold; /* Poids gras pour le texte du résultat */
-    color: var(--turquoise); /* Définir la couleur turquoise pour le texte du résultat */
-}
-
-.container {
-    display: grid; /* Utiliser la disposition en grille pour le conteneur */
-    grid-template-columns: repeat(8, 1fr); /* 8 colonnes de largeur égale */
-    grid-gap: 20px; /* Espacement entre les éléments de la grille */
-}
-
-.footer {
-    font-family: 'Century Gothic', sans-serif; /* Utiliser Century Gothic pour le pied de page */
-    text-align: center; /* Centrer le texte du pied de page */
-    color: var(--blue-marine); /* Définir la couleur bleue primaire pour le texte du pied de page */
-    margin-top: 40px; /* Ajouter un espacement au-dessus du pied de page */
-}
-
-table {
-    width: 25%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-th, td {
-    border: 1px solid var(--sable);
-    padding: 10px;
-    text-align: center;
-    font-family: 'Gellix', sans-serif;
-    color: var(--blue-marine);
-}
-
-th {
+.toggle-button {
     background-color: var(--turquoise);
+    color: var(--white);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-family: 'Gellix', sans-serif;
     font-weight: bold;
 }
 
-td {
-    background-color: var(--white);
+.toggle-button:hover {
+    background-color: #1da7b8;
 }
 
-.formula {
-    font-size: 18pt; /* Augmenter la taille de la police pour améliorer la lisibilité */
-    padding: 15px; /* Espacement interne pour aérer la formule */
-    margin: 20px 0; /* Ajouter une marge pour l'espacement vertical */
-    font-family: 'Gellix', sans-serif; /* Utiliser une police claire */
+/* Styles des tableaux */
+table {
+    /* Ajouter des styles de base pour les tableaux */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid var(--black);
+    padding: 8px;
+    text-align: center;
+}
+
+#diameterTable {
+    width: auto; /* Ajuster la largeur de la table en fonction du contenu */
+}
+
+/* Conteneurs de disposition */
+.container, .chart-container, .form-chart-container {
+    display: grid; /* Utiliser la disposition en grille pour le conteneur */
+    grid-template-columns: repeat(8, 1fr); /* 8 colonnes de largeur égale */
+    grid-gap: 20px; /* Espacement entre les éléments de la grille */
 }
 
 .chart-container {
@@ -213,6 +175,7 @@ form#inputForm {
     flex: 1 1 65%; /* Ajuster la largeur du graphique */
 }
 
+/* Styles des notes informatives */
 .note {
     font-size: 10pt; /* Taille de police plus petite */
     font-style: italic; /* Style italique */
@@ -233,29 +196,8 @@ form#inputForm {
     color: var(--turquoise); /* Couleur de l'icône */
 }
 
-/* Classe pour masquer la table */
-.collapsed {
-    display: none;
-}
-
-/* Style pour le bouton de bascule */
-.toggle-button {
-    background-color: var(--turquoise);
-    color: var(--white);
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    font-family: 'Gellix', sans-serif;
-    font-weight: bold;
-}
-
-.toggle-button:hover {
-    background-color: #1da7b8;
-}
-
-.highlighted {
+/* États et effets visuels */
+.highlighted, .result-highlighted, .collapsed {
     font-weight: bold; /* Poids gras pour l'accentuation */
     /* background-color: green; Commenté car remplacé par la règle ci-dessous */
 }
@@ -263,4 +205,32 @@ form#inputForm {
 .highlighted td {
     background-color: green; /* Définir la couleur de fond en vert */
     color: var(--white); /* Définir la couleur du texte en blanc */
+}
+
+.result-highlighted {
+    background-color: green; /* Définir la couleur de fond en vert */
+    color: var(--white) !important; /* Forcer la couleur du texte en blanc */
+    padding: 5px 10px; /* Ajouter un peu de padding pour l'espacement */
+    border-radius: 4px; /* Coins arrondis pour un aspect plus doux */
+}
+
+/* Styles du pied de page */
+.footer {
+    font-family: 'Century Gothic', sans-serif; /* Utiliser Century Gothic pour le pied de page */
+    text-align: center; /* Centrer le texte du pied de page */
+    color: var(--blue-marine); /* Définir la couleur bleue primaire pour le texte du pied de page */
+    margin-top: 40px; /* Ajouter un espacement au-dessus du pied de page */
+}
+
+/* Styles des formules */
+.formula {
+    font-size: 18pt; /* Augmenter la taille de la police pour améliorer la lisibilité */
+    padding: 15px; /* Espacement interne pour aérer la formule */
+    margin: 20px 0; /* Ajouter une marge pour l'espacement vertical */
+    font-family: 'Gellix', sans-serif; /* Utiliser une police claire */
+}
+
+/* Classe pour masquer la table */
+.collapsed {
+    display: none;
 }

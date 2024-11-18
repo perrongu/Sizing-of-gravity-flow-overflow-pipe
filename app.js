@@ -115,6 +115,10 @@ document.addEventListener("DOMContentLoaded", () => {
     calculerDiametre();
 });
 
+/* ===========================
+   Gestion des événements du formulaire
+   =========================== */
+
 // Empêcher le comportement par défaut du formulaire et mettre à jour le graphique lors de la soumission
 document.getElementById("inputForm").addEventListener("submit", event => {
     event.preventDefault();
@@ -122,7 +126,7 @@ document.getElementById("inputForm").addEventListener("submit", event => {
     mettreAJourGraphique();
 });
 
-// Mettre à jour le graphique lors de l'entrée de Q_max
+// Mettre à jour le graphique lors de l'entrée de Q_max via le slider
 document.getElementById("Q_max").addEventListener("input", () => {
     if (document.getElementById("pipeType").value) {
         calculerDiametre();
@@ -160,6 +164,10 @@ document.getElementById("Q_max").addEventListener("input", (event) => {
     mettreAJourGraphique();
 });
 
+/* ===========================
+   Fonctions de mise à jour des valeurs
+   =========================== */
+
 // Mettre à jour l'affichage de Q_max depuis le slider
 function updateQmaxValue(value) {
     document.getElementById("Q_max_value").textContent = value;
@@ -176,15 +184,25 @@ function updateQmaxRange(value) {
     mettreAJourGraphique();
 }
 
+/* ===========================
+   Variables globales
+   =========================== */
+
 let selectedID_mm = null; // Variable pour stocker l'ID_mm sélectionné
 let selectedDN = null; // Nouvelle variable pour stocker le DN sélectionné
 
-// Calculer le diamètre en fonction du Q_max et du type de tuyauterie
+/* ===========================
+   Fonctions de calcul
+   =========================== */
+
+/**
+ * Calculer le diamètre en fonction du Q_max et du type de tuyauterie
+ */
 function calculerDiametre() {
     const Q_max_input = document.getElementById("Q_max").value;
     const pipeType = document.getElementById("pipeType").value;
 
-    if (!Q_max_input || isNaN(Q_max_input) || parseFloat(Q_max_input) <= 0) {
+    if (!isValidInput(Q_max_input)) {
         document.getElementById("result").textContent = "Veuillez entrer un débit volumique maximal valide.";
         return;
     }
@@ -197,7 +215,7 @@ function calculerDiametre() {
     const J_t = 0.3;
     const g = 9.81;
 
-    const d = Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 0.4);
+    const d = calculerDiametreFormula(Q_max, J_t, g);
     const d_mm = d * 1000;
 
     if (!window.diameters_data || !window.diameters_data[pipeType]) {
@@ -211,30 +229,61 @@ function calculerDiametre() {
         return;
     }
 
-    let selected_diameter = null;
-    selectedID_mm = null;
-    selectedDN = null;
-    for (const diameter of diameters) {
-        if (diameter.ID_mm >= d_mm) {
-            selected_diameter = diameter;
-            selectedID_mm = diameter.ID_mm;
-            selectedDN = diameter.DN;
-            break;
-        }
-    }
-
+    let selected_diameter = trouverDiameterSupérieur(diameters, d_mm);
     document.getElementById("result").textContent = selected_diameter 
         ? `ID ${selected_diameter.ID_mm.toFixed(1)} mm | DN${selected_diameter.DN} | NPS ${selected_diameter.NPS}` 
         : "Aucun diamètre approprié trouvé";
 
-    // Appeler mettreAJourEquations pour générer la démarche pas à pas
     mettreAJourEquations(Q_max_input, Q_max, d, d_mm, selected_diameter);
-
-    // Mettre à jour la mise en évidence dans la table
     mettreEnEvidenceTable();
 }
 
-// Mettre à jour la ligne sélectionnée dans la table
+/**
+ * Vérifier si l'entrée est valide
+ * @param {string} input 
+ * @returns {boolean}
+ */
+function isValidInput(input) {
+    return input && !isNaN(input) && parseFloat(input) > 0;
+}
+
+/**
+ * Calculer le diamètre à l'aide de la formule donnée
+ * @param {number} Q_max 
+ * @param {number} J_t 
+ * @param {number} g 
+ * @returns {number}
+ */
+function calculerDiametreFormula(Q_max, J_t, g) {
+    return Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 0.4);
+}
+
+/**
+ * Trouver le diamètre standard supérieur au diamètre calculé
+ * @param {Array} diameters 
+ * @param {number} d_mm 
+ * @returns {Object|null}
+ */
+function trouverDiameterSupérieur(diameters, d_mm) {
+    selectedID_mm = null;
+    selectedDN = null;
+    for (const diameter of diameters) {
+        if (diameter.ID_mm >= d_mm) {
+            selectedID_mm = diameter.ID_mm;
+            selectedDN = diameter.DN;
+            return diameter;
+        }
+    }
+    return null;
+}
+
+/* ===========================
+   Mise à jour de la table
+   =========================== */
+
+/**
+ * Mettre à jour la ligne sélectionnée dans la table
+ */
 function mettreEnEvidenceTable() {
     const diameterTableBody = document.getElementById('diameterTableBody');
     const rows = diameterTableBody.getElementsByTagName('tr');
@@ -256,7 +305,13 @@ function mettreEnEvidenceTable() {
     });
 }
 
-// Générer les données pour le graphique
+/* ===========================
+   Génération des données du graphique
+   =========================== */
+
+/**
+ * Générer les données pour le graphique
+ */
 function genererDonneesGraphique() {
     const J_t = 0.3;
     const g = 9.81;
@@ -264,7 +319,7 @@ function genererDonneesGraphique() {
     window.dataPoints = [];
     for (let Q = 0; Q <= 500; Q += 1) {
         const Q_m3s = Q / 3600;
-        const d_temp = Math.pow((4 * Q_m3s) / (Math.PI * J_t * Math.sqrt(g)), 0.4) * 1000;
+        const d_temp = calculerDiametreFormula(Q_m3s, J_t, g) * 1000;
         window.dataPoints.push({ x: Q, y: d_temp });
     }
 
@@ -317,18 +372,18 @@ function genererDonneesGraphique() {
     });
 }
 
-// Mettre à jour le graphique avec les annotations basées sur Q_max et d
+/* ===========================
+   Mise à jour du graphique
+   =========================== */
+
+/**
+ * Mettre à jour le graphique avec les annotations basées sur Q_max et d
+ */
 function mettreAJourGraphique() {
     const Q_max_input = document.getElementById("Q_max").value;
     const pipeType = document.getElementById("pipeType").value;
 
-    if (!Q_max_input || isNaN(Q_max_input) || parseFloat(Q_max_input) <= 0) {
-        // document.getElementById("highlightedPoint").textContent = "Veuillez entrer un débit volumique maximal valide.";
-        return;
-    }
-
-    if (!pipeType) {
-        // document.getElementById("highlightedPoint").textContent = "Veuillez sélectionner un type de tuyauterie.";
+    if (!isValidInput(Q_max_input) || !pipeType) {
         return;
     }
 
@@ -337,7 +392,7 @@ function mettreAJourGraphique() {
     const g = 9.81;
 
     // Calculer le diamètre correspondant
-    const d = Math.pow((4 * Q_max) / (Math.PI * J_t * Math.sqrt(g)), 0.4);
+    const d = calculerDiametreFormula(Q_max, J_t, g);
     const d_mm = d * 1000;
 
     // Initialiser les annotations avec le point et les lignes correspondantes
@@ -399,13 +454,7 @@ function mettreAJourGraphique() {
     });
 
     // Trouver le prochain diamètre standard supérieur
-    let nextDiameter = null;
-    for (const diameter of diameters) {
-        if (diameter.ID_mm > d_mm) {
-            nextDiameter = diameter;
-            break;
-        }
-    }
+    let nextDiameter = trouverDiameterSupérieur(diameters, d_mm);
 
     if (nextDiameter) {
         annotations.nextStandardPoint = {
@@ -459,7 +508,15 @@ function mettreAJourGraphique() {
     window.myChart.update();
 }
 
-// Afficher les diamètres standards pour le type de tuyauterie sélectionné
+/* ===========================
+   Affichage des diamètres standards
+   =========================== */
+
+/**
+ * Afficher les diamètres standards pour le type de tuyauterie sélectionné
+ * @param {string} pipeType 
+ * @returns {Array}
+ */
 function afficherDiametresStandards(pipeType) {
     if (!window.diameters_data || !window.diameters_data[pipeType]) {
         alert("Les données des diamètres ne sont pas disponibles.");
@@ -475,13 +532,27 @@ function afficherDiametresStandards(pipeType) {
     return diameters;
 }
 
-// Fonction pour mettre à jour le titre des diamètres standards
+/* ===========================
+   Mise à jour des titres et équations
+   =========================== */
+
+/**
+ * Mettre à jour le titre des diamètres standards
+ * @param {string} pipeType 
+ */
 function mettreAJourTitreDiametres(pipeType) {
     const titleElement = document.getElementById("diameterTitle");
     titleElement.textContent = `Diamètres intérieurs standards pour la spécification ${pipeType}`;
 }
 
-// Mettre à jour les équations avec les nouvelles valeurs
+/**
+ * Mettre à jour les équations avec les nouvelles valeurs
+ * @param {number} Q_max_input 
+ * @param {number} Q_max 
+ * @param {number} d 
+ * @param {number} d_mm 
+ * @param {Object} selected_diameter 
+ */
 function mettreAJourEquations(Q_max_input, Q_max, d, d_mm, selected_diameter) {
     // ...existing code updating the equations...
     
@@ -494,10 +565,22 @@ function mettreAJourEquations(Q_max_input, Q_max, d, d_mm, selected_diameter) {
     }
 }
 
-// Fonction pour générer la démarche pas à pas des calculs
+/**
+ * Générer la démarche pas à pas des calculs
+ * @param {number} Q_max_input 
+ * @param {number} Q_max 
+ * @param {number} d 
+ * @param {number} d_mm 
+ */
 function genererDemarchePasAPas(Q_max_input, Q_max, d, d_mm) {
     const stepContainer = document.getElementById('stepByStep');
     stepContainer.innerHTML = `
+        <h3>On connait les valeurs suivantes</h3>
+        <ul>
+            <li>Le débit volumique maximal : \\( Q_{max} = \\frac{${Q_max_input} \\, \\text{m}³}{\\text{h}} \\)</li>
+            <li>La perte de charge spécifique : \\( J_t = 0.3 \\)</li>
+            <li>L'accélération gravitationnelle : \\( g = 9.81 \\, \\text{m/s}² \\)</li>
+        </ul>
         <h3>Calcul du diamètre minimum requis</h3>
         <ol>
             <li>
@@ -513,5 +596,9 @@ function genererDemarchePasAPas(Q_max_input, Q_max, d, d_mm) {
                 $$ d_{mm} = ${ d.toFixed(4) } \\, \\text{m} \\times 1000 = ${ d_mm.toFixed(2) } \\, \\text{mm} $$
             </li>
         </ol>
+        <h3>Identification du diamètre standard supérieur</h3>
+        <p>
+            Après avoir calculé le diamètre minimum requis, nous comparons ce résultat avec les diamètres standards disponibles. Le plus petit diamètre standard égal ou supérieur est sélectionné.
+        </p>
     `;
 }

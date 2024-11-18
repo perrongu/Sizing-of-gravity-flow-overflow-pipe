@@ -1,21 +1,35 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Métadonnées de base -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overflow gravitaire</title>
+    
+    <!-- Importation des polices Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Lien vers la feuille de style CSS -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Polyfill pour la compatibilité ES6 -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    
+    <!-- MathJax pour le rendu des équations -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Importation de Chart.js et le plugin d'annotation -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
 </head>    
 <body>
+    <!-- Titre principal de la page -->
     <h1>Calcul du Diamètre d'un overflow gravitaire auto-ventilé</h1>
 
+    <!-- Section de spécification du débit et type de tuyauterie -->
     <h2>Spécification du débit et du type de tuyauterie</h2>
     <div class="form-chart-container">
+        <!-- Formulaire d'entrée des données -->
         <form id="inputForm">
             <label for="Q_max">Débit volumique \( Q_{\text{max}} \) (m³/h) :</label>
             <input type="range" id="Q_max" name="Q_max" min="0" max="500" step="1" value="50" oninput="updateQmaxValue(this.value)">
@@ -25,55 +39,70 @@
             <select id="pipeType" name="pipeType" required>
                 <option value="" disabled>Sélectionnez un type de tuyauterie</option>
                 <option value="Steel_SCH40" selected>Steel_SCH40</option>
+                <!-- Ajouter d'autres options si nécessaire -->
             </select>        
         </form>
+        
+        <!-- Conteneur pour le graphique -->
         <div class="chart-container">
             <canvas id="chart"></canvas>
         </div>
     </div>
 
+    <!-- Section de résultat -->
     <div>
         <h2>Résultat</h2>
         <p>
             Le plus petit diamètre standard supérieur au diamètre calculé est :
-            <strong id="result"></strong>
+            <strong id="result" class="result-highlighted"></strong>
         </p>
         <p class="note">
             Le diamètre de la tuyère doit être égal ou supérieur au diamètre calculé pour assurer un bon fonctionnement.
         </p>
     </div>
 
+    <!-- Section de détails du calcul -->
     <div>
         <h2>Détails du calcul</h2>
         <div id="stepByStep"></div>
     </div>
 
+    <!-- Section des diamètres intérieurs standards -->
     <div>
-        <h2 id="diameterTitle">Diamètres Intérieurs Standards</h2>
-        <button class="toggle-button" id="toggleTable">Afficher les diamètres standards</button>
-        <p>Diamètres intérieurs standards pour les conduites :</p>
-        <table id="diameterTable" class="collapsed">
-            <thead>
-                <tr>
-                    <th>DN</th>
-                    <th>NPS</th>
-                    <th>Diamètre Intérieur (ID) mm</th>
-                </tr>
-            </thead>
-            <tbody id="diameterTableBody">
-            </tbody>
-        </table>
+        <h2>Références</h2>
+        <div>
+            <h3 id="diameterTitle">Diamètres Intérieurs Standards</h3>
+            <button class="toggle-button" id="toggleTable">Afficher les diamètres standards</button>
+            <p>Diamètres intérieurs standards pour les conduites :</p>
+            <table id="diameterTable" class="collapsed">
+                <thead>
+                    <tr>
+                        <th>DN</th>
+                        <th>NPS</th>
+                        <th>Diamètre Intérieur (ID) mm</th>
+                    </tr>
+                </thead>
+                <tbody id="diameterTableBody">
+                    <!-- Les lignes seront générées dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3>Documents source</h3>
+            <ul>
+                <li><a href="Gravity-Flow-Piping_FR.pdf" target="_blank">Gravity-Flow-Piping_FR.pdf</a></li>
+                <li><a href="Gravity-Flow-Piping_EN.pdf" target="_blank">Gravity-Flow-Piping_EN.pdf</a></li>
+                <li><a href="Gravity-Flow-Piping_ORIGINAL.pdf" target="_blank">Gravity-Flow-Piping_ORIGINAL.pdf</a></li>
+            </ul>
+        </div>
     </div>
 
+    <!-- Pied de page avec références -->
     <footer>
-        <h3>Références</h3>
-        <ul>
-            <li><a href="Gravity-Flow-Piping_FR.pdf" target="_blank">Gravity-Flow-Piping_FR.pdf</a></li>
-            <li><a href="Gravity-Flow-Piping_EN.pdf" target="_blank">Gravity-Flow-Piping_EN.pdf</a></li>
-            <li><a href="Gravity-Flow-Piping_ORIGINAL.pdf" target="_blank">Gravity-Flow-Piping_ORIGINAL.pdf</a></li>
-        </ul>
+
     </footer>
 
+    <!-- Script JavaScript principal -->
     <script src="app.js"></script>
 </body>
 </html>
